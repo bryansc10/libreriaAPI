@@ -8,6 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.soca.libreriaapi.entidades.Libro;
 import com.soca.libreriaapi.excepciones.MiExcepcion;
+import com.soca.libreriaapi.modelos.LibroCreateDTO;
+import com.soca.libreriaapi.modelos.LibroListarActivosDTO;
 import com.soca.libreriaapi.repositorios.AutorRepositorio;
 import com.soca.libreriaapi.repositorios.EditorialRepositorio;
 import com.soca.libreriaapi.repositorios.LibroRepositorio;
@@ -23,55 +25,48 @@ public class LibroServicio {
 
 	// CREATE
 	@Transactional
-	public void crearLibro(Integer id_libro, 
-						   Integer ejemplares, 
-						   Boolean libro_activo, 
-						   String titulo, 
-						   String id_titulo,
-						   String id_editorial, 
-						   String id_autor) throws MiExcepcion {
-		validar(id_libro, ejemplares, id_titulo, id_autor, id_editorial);
+	public void crearLibro(LibroCreateDTO libroCreateDTO) throws MiExcepcion {
+		validar(libroCreateDTO);
 		Libro libro = new Libro();
-		libro.setId_libro(id_libro);
-		libro.setEjemplares(ejemplares);
-		libro.setLibro_activo(libro_activo);
-		libro.setTitulo(id_titulo);
-		libro.setId_editorial(editorialRepositorio.getReferenceById(id_editorial));
-		libro.setId_autor(autorRepositorio.getReferenceById(id_autor));
+		libro.setId_libro(libroCreateDTO.getIsbn());
+		libro.setEjemplares(libroCreateDTO.getEjemplares());
+		libro.setLibro_activo(libroCreateDTO.getLibroActivo());
+		libro.setTitulo(libroCreateDTO.getTitulo());
+		libro.setId_editorial(editorialRepositorio.getReferenceById(libroCreateDTO.getIdEditorial()));
+		libro.setId_autor(autorRepositorio.getReferenceById(libroCreateDTO.getIdAutor()));
 		
 		libroRepositorio.save(libro);
 	}
 	
 	// READ
 	@Transactional(readOnly = true)
-	public List<Libro> listarLibros() {
+	public List<Libro> listarLibros() throws MiExcepcion {
 		return libroRepositorio.findAll();
 	}
 	
 	@Transactional(readOnly = true)
-	public Libro getOne(Integer id_libro) {
+	public Libro getOne(Integer id_libro) throws MiExcepcion {
 		return libroRepositorio.getReferenceById(id_libro);
 	}
 	
+	@Transactional(readOnly = true)
+	public List<LibroListarActivosDTO> listarLibrosActivos() throws MiExcepcion {
+		return libroRepositorio.encontrarActivos();
+	}
+	
 	// UPDATE
-		public void modificarLibro(Integer id_libro, 
-							   		Integer ejemplares, 
-							   		Boolean libro_activo, 
-							   		String titulo, 
-							   		String id_titulo,
-							   		String id_editorial, 
-							   		String id_autor) throws MiExcepcion {
-			validar(id_libro, ejemplares, id_titulo, id_autor, id_editorial);
-			Libro libro = libroRepositorio.findById(id_libro).get();
+		public void modificarLibro(LibroCreateDTO libroCreateDTO) throws MiExcepcion {
+			validar(libroCreateDTO);
+			Libro libro = libroRepositorio.findById(libroCreateDTO.getIsbn()).get();
 			if (libro == null) {
-				throw new MiExcepcion("No se encontró libro con id: " + id_libro);
+				throw new MiExcepcion("No se encontró libro con id: " + libroCreateDTO.getIsbn());
 			}
-			libro.setId_libro(id_libro);
-			libro.setEjemplares(ejemplares);
-			libro.setLibro_activo(libro_activo);
-			libro.setTitulo(id_titulo);
-			libro.setId_editorial(editorialRepositorio.getReferenceById(id_editorial));
-			libro.setId_autor(autorRepositorio.getReferenceById(id_autor));
+			libro.setId_libro(libroCreateDTO.getIsbn());
+			libro.setEjemplares(libroCreateDTO.getEjemplares());
+			libro.setLibro_activo(libroCreateDTO.getLibroActivo());
+			libro.setTitulo(libroCreateDTO.getTitulo());
+			libro.setId_editorial(editorialRepositorio.getReferenceById(libroCreateDTO.getIdEditorial()));
+			libro.setId_autor(autorRepositorio.getReferenceById(libroCreateDTO.getIdAutor()));
 			
 			libroRepositorio.save(libro);
 		}
@@ -81,12 +76,20 @@ public class LibroServicio {
 	public void excluirLibro(Integer id_libro) throws MiExcepcion {
 		Libro libro = libroRepositorio.getReferenceById(id_libro);
 		libro.setLibro_activo(false);
+		
+		libroRepositorio.save(libro);
 	}
 	
 	// VALIDAR
-	private void validar(Integer id_libro, Integer ejemplares, String titulo, String id_autor, String id_editorial)
+	private void validar(LibroCreateDTO libroCreateDTO)
 			throws MiExcepcion {
-		if (id_libro == null) {
+		final Integer isbn = libroCreateDTO.getIsbn();
+		final String titulo = libroCreateDTO.getTitulo();
+		final Integer ejemplares = libroCreateDTO.getEjemplares();
+		final String id_autor = libroCreateDTO.getIdAutor();
+		final String id_editorial = libroCreateDTO.getIdEditorial();
+		
+		if (isbn == null) {
 			throw new MiExcepcion("El codigo isbn no puede ser nulo.");
 		}
 		if (titulo.isEmpty() || titulo == null) {

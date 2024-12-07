@@ -16,7 +16,7 @@ import lombok.Setter;
 public class Autor {
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
-	@Column(length = 16)
+	@Column(length = 36)
 	private String id_autor;
 	@Column(length = 1, nullable = false)
 	private Boolean autor_activo;

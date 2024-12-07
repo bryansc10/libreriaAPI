@@ -19,7 +19,7 @@ import lombok.Setter;
 public class Editorial {
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
-	@Column(length = 16)
+	@Column(length = 36)
 	private String id_editorial;
 	@Column(length = 1, nullable = false)
 	private Boolean editorial_activa;
