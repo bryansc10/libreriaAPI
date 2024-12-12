@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.soca.libreriaapi.entidades.Editorial;
 import com.soca.libreriaapi.excepciones.MiExcepcion;
+import com.soca.libreriaapi.modelos.EditorialCreateDTO;
 import com.soca.libreriaapi.repositorios.EditorialRepositorio;
 
 @Service
@@ -23,6 +24,21 @@ public class EditorialServicio {
 		Editorial editorial = new Editorial();
 		editorial.setNombre_editorial(nombreEditorial);
 		editorial.setEditorial_activa(actividad);
+		editorialRepositorio.save(editorial);
+	}
+	
+	@Transactional
+	public void crearEditorial(EditorialCreateDTO editorialDTO) throws MiExcepcion {
+		final String nombreEditorial = editorialDTO.getNombreEditorial();
+		final Boolean activo = editorialDTO.getActividadEditorial();
+		
+		validarNombre(nombreEditorial);
+		Editorial editorial = new Editorial();
+		
+		editorial.setNombre_editorial(nombreEditorial);
+		editorial.setEditorial_activa(activo);
+		
+	
 		editorialRepositorio.save(editorial);
 	}
 
@@ -70,4 +86,6 @@ public class EditorialServicio {
 		if (!editorial.isPresent())
 			throw new MiExcepcion("No se encontro una editorial con ese id.");
 	}
+	
+	
 }

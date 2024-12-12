@@ -8,12 +8,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.soca.libreriaapi.entidades.Autor;
 import com.soca.libreriaapi.excepciones.MiExcepcion;
+import com.soca.libreriaapi.modelos.AutorModificarDTO;
 import com.soca.libreriaapi.servicios.AutorServicio;
 
 @RestController
@@ -22,8 +24,9 @@ public class AutorControlador {
 	@Autowired
 	private AutorServicio autorServicio;
 	
+	// POST
 	@PostMapping("/crear")
-	public ResponseEntity<Object> crearAutor(String nombre, Boolean activo) {
+	public ResponseEntity<Object> crearAutor(@RequestParam String nombre, @RequestParam Boolean activo) {
 		try {
 			autorServicio.crearAutor(nombre, activo);
 			return new ResponseEntity<Object>(HttpStatus.OK);
@@ -33,6 +36,7 @@ public class AutorControlador {
 		}
 	}
 	
+	// GET
 	@GetMapping("/listar")
 	public ResponseEntity<Object> listarAutores() {
 		try {
@@ -44,10 +48,11 @@ public class AutorControlador {
 		}
 	}
 	
+	// PATCH
 	@PatchMapping("/modificar")
-	public ResponseEntity<Void> modificarAutor(@RequestParam String id, @RequestParam String nombre) {
+	public ResponseEntity<Void> modificarAutor(@RequestBody AutorModificarDTO modificar) {
 		try {
-			autorServicio.cambiarNombre(nombre, id);
+			autorServicio.cambiarNombre(modificar);
 			return ResponseEntity.ok().build();
 			
 		} catch (MiExcepcion e) {

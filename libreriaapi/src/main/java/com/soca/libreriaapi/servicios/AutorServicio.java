@@ -3,18 +3,22 @@ package com.soca.libreriaapi.servicios;
 import java.util.List;
 import java.util.Optional;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.soca.libreriaapi.entidades.Autor;
 import com.soca.libreriaapi.excepciones.MiExcepcion;
+import com.soca.libreriaapi.modelos.AutorModificarDTO;
 import com.soca.libreriaapi.repositorios.AutorRepositorio;
 
 @Service
 public class AutorServicio {
 	@Autowired
 	private AutorRepositorio autorRepositorio;
+	@Autowired
+	private ModelMapper modelMapper;
 
 	// CREATE
 	@Transactional
@@ -35,16 +39,19 @@ public class AutorServicio {
 
 	// UPDATE
 	@Transactional
-	public void incluirEditorial(String id) throws MiExcepcion {
+	public void incluirAutor(String id) throws MiExcepcion {
 		validarID(id);
 		obtenerAutor(id).setAutor_activo(true);
 	}
 
 	@Transactional
-	public void cambiarNombre(String nombreAutor, String id) throws MiExcepcion {
-		validarID(id);
-		validarNombre(nombreAutor);
-		obtenerAutor(id).setNombre_autor(nombreAutor);
+	public void cambiarNombre(AutorModificarDTO modificarDTO) throws MiExcepcion {
+		validarID(modificarDTO.getId_autor());
+		validarNombre(modificarDTO.getNombre_autor());
+		Autor autor = autorRepositorio.getReferenceById(modificarDTO.getId_autor());
+		modelMapper.map(modificarDTO, autor);
+		
+		autorRepositorio.save(autor);
 	}
 
 	// READ

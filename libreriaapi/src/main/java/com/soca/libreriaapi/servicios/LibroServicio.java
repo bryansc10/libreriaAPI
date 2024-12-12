@@ -10,6 +10,7 @@ import com.soca.libreriaapi.entidades.Libro;
 import com.soca.libreriaapi.excepciones.MiExcepcion;
 import com.soca.libreriaapi.modelos.LibroCreateDTO;
 import com.soca.libreriaapi.modelos.LibroListarActivosDTO;
+import com.soca.libreriaapi.modelos.LibrosPorEntidadDTO;
 import com.soca.libreriaapi.repositorios.AutorRepositorio;
 import com.soca.libreriaapi.repositorios.EditorialRepositorio;
 import com.soca.libreriaapi.repositorios.LibroRepositorio;
@@ -52,6 +53,16 @@ public class LibroServicio {
 	@Transactional(readOnly = true)
 	public List<LibroListarActivosDTO> listarLibrosActivos() throws MiExcepcion {
 		return libroRepositorio.encontrarActivos();
+	}
+	
+	@Transactional(readOnly = true)
+	public List<LibrosPorEntidadDTO> listarLibrosIDEditorial(String idEditorial) throws MiExcepcion {
+		return libroRepositorio.listarLibrosPorEditorial(idEditorial);
+	}
+	
+	@Transactional(readOnly = true)
+	public List<LibrosPorEntidadDTO> listarLibrosIDAutor(String idAutor) throws MiExcepcion {
+		return libroRepositorio.listarLibrosPorAutor(idAutor);
 	}
 	
 	// UPDATE
